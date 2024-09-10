@@ -3,7 +3,6 @@ defmodule DesafioCli.Transaction do
 
   def open(connection_count, db, transactions) do
     new_count = connection_count + 1
-    # Adiciona nova transação (nova camada)
     transactions = [%{} | transactions]
     DesafioCli.start(new_count, db, transactions)
   end
@@ -41,7 +40,6 @@ defmodule DesafioCli.Transaction do
     else
       IO.puts(connection_count)
       db = Enum.reduce(transactions, db, fn txn, acc -> Map.merge(acc, txn) end)
-      # Reseta as transações após o commit
       DesafioCli.start(0, db, [])
     end
   end
@@ -52,14 +50,13 @@ defmodule DesafioCli.Transaction do
       DesafioCli.start(connection_count, db, transactions)
     else
       IO.puts("Rolling back last transaction.")
-      # Remove a transação mais recente
       DesafioCli.start(connection_count - 1, db, tl(transactions))
     end
   end
 
-  defp get_value_from_transactions(key, []), do: nil
+  def get_value_from_transactions(key, []), do: nil
 
-  defp get_value_from_transactions(key, [latest_txn | rest]) do
+  def get_value_from_transactions(key, [latest_txn | rest]) do
     case Map.get(latest_txn, key) do
       nil -> get_value_from_transactions(key, rest)
       value -> value
